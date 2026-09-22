@@ -147,6 +147,16 @@ final class ProductTranslationBox
 
             $body = '';
 
+            // A field the schema marks as edited elsewhere. Sightline's
+            // SEO keys are the case: they are in the schema so the
+            // content API and this plugin can both see them, and
+            // seo_fields() below already renders them in their own tab.
+            // Rendering them here as well would put two inputs over one
+            // meta key in one form, and whichever came last would win.
+            if (isset($definition['admin']) && false === $definition['admin']) {
+                continue;
+            }
+
             if ('repeater' === $type) {
                 $body = $this->repeater($post_id, $lang, $name, $definition, $prefix);
             } elseif (!Commerce::is_protected($name) && ul_field_is_translatable($definition)) {

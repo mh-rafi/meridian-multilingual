@@ -1,0 +1,629 @@
+# Copyright (C) 2026 MH Rafi
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Meridian 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/meridian-multilingual\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-09-21T22:45:07+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: meridian\n"
+
+#. Plugin Name of the plugin
+#: meridian-multilingual.php
+#: includes/Admin/LanguagesScreen.php:36
+#: includes/Admin/LanguagesScreen.php:37
+msgid "Meridian"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+#: meridian-multilingual.php
+msgid "https://ui-lib.com/"
+msgstr ""
+
+#. Description of the plugin
+#: meridian-multilingual.php
+msgid "Multilingual content with directory-prefixed URLs, correct hreflang, and a storage model that does not duplicate a product a customer bought once."
+msgstr ""
+
+#. Author of the plugin
+#: meridian-multilingual.php
+msgid "MH Rafi"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:47
+#: includes/Admin/LanguagesScreen.php:48
+#: includes/Admin/LanguagesScreen.php:128
+#: includes/Admin/TermTranslations.php:72
+msgid "Languages"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:64
+msgid "You are not allowed to configure languages."
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:133
+msgid "Languages saved."
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:139
+msgid "The default language is served at the site root with no prefix. Every other language is served under its own code, e.g. /es/. Changing which language is the default moves the prefix — it does not move any content."
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:149
+msgid "Default"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:150
+#: includes/Admin/TranslationsBox.php:217
+#: includes/Frontend/Switcher.php:99
+msgid "Language"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:151
+msgid "Code"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:152
+msgid "Locale"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:153
+msgid "Direction"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:154
+msgid "Flag"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:155
+msgid "Active"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:156
+msgid "URL"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:171
+msgid "Add language"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:174
+msgid "Save languages"
+msgstr ""
+
+#. translators: %s: a comma-separated list of language names.
+#: includes/Admin/LanguagesScreen.php:300
+#, php-format
+msgid "%s has no translated front page."
+msgid_plural "%s have no translated front page."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Admin/LanguagesScreen.php:303
+msgid "Until it does, every page translated into that language links to a home page that does not exist. Translate the front page first, or leave the language inactive."
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:320
+msgid "Make this the default language"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:325
+msgid "Native name, e.g. Español"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:328
+msgid "English name, e.g. Spanish"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:341
+msgid "LTR"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:342
+msgid "RTL"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:347
+msgid "none"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:348
+msgid "Country code for a flag, or leave empty"
+msgstr ""
+
+#: includes/Admin/LanguagesScreen.php:352
+msgid "Serve this language"
+msgstr ""
+
+#: includes/Admin/Porter.php:38
+#: includes/Admin/Porter.php:70
+#: includes/Admin/StringsScreen.php:55
+#: includes/Admin/TermTranslations.php:172
+#: includes/Admin/TranslationsBox.php:259
+msgid "You are not allowed to do that."
+msgstr ""
+
+#: includes/Admin/Porter.php:78
+msgid "Choose a file to import."
+msgstr ""
+
+#: includes/Admin/Porter.php:84
+msgid "That does not look like a Meridian export."
+msgstr ""
+
+#: includes/Admin/ProductTranslationBox.php:51
+#: includes/Admin/TermTranslations.php:100
+#: includes/Admin/TranslationsBox.php:60
+msgid "Translations"
+msgstr ""
+
+#: includes/Admin/ProductTranslationBox.php:65
+msgid "Only one language is active, so there is nothing to translate yet."
+msgstr ""
+
+#: includes/Admin/ProductTranslationBox.php:71
+msgid "This product stays one product in every language — one ID, one price, one set of files, one rating. Only the words below change."
+msgstr ""
+
+#: includes/Admin/ProductTranslationBox.php:113
+msgid "Title"
+msgstr ""
+
+#: includes/Admin/ProductTranslationBox.php:120
+msgid "URL slug"
+msgstr ""
+
+#: includes/Admin/ProductTranslationBox.php:121
+msgid "Leave empty to use the source slug. Changing this records a redirect from the old one."
+msgstr ""
+
+#: includes/Admin/ProductTranslationBox.php:127
+msgid "Description"
+msgstr ""
+
+#: includes/Admin/ProductTranslationBox.php:134
+msgid "Excerpt"
+msgstr ""
+
+#. translators: %d: number of rows on the source product.
+#: includes/Admin/ProductTranslationBox.php:202
+#, php-format
+msgid "%d row, matching the source. Rows are added and removed on the source, not here."
+msgid_plural "%d rows, matching the source. Rows are added and removed on the source, not here."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Admin/ProductTranslationBox.php:240
+msgid "Source:"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:36
+#: includes/Admin/SettingsScreen.php:37
+msgid "Settings"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:47
+msgid "You are not allowed to change these settings."
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:109
+msgid "Meridian settings"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:112
+msgid "Settings saved."
+msgstr ""
+
+#. translators: %d: how many rows were imported.
+#: includes/Admin/SettingsScreen.php:121
+#, php-format
+msgid "%d row imported."
+msgid_plural "%d rows imported."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Admin/SettingsScreen.php:131
+msgid "Shared pages"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:133
+msgid "Pages that are the same page in every language. They are never duplicated — a plugin that finds a page by ID would stop recognising a copy — but they are reachable under every language prefix, and what a visitor reads is their shortcodes’ output."
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:137
+msgid "Detected automatically:"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:146
+msgid "Also treat these pages as shared:"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:166
+msgid "Paths that never take a language prefix"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:168
+msgid "One per line, relative to the site root. This is where a path owned by something else on the same domain goes — another WordPress installation in a subdirectory, for instance. WordPress cannot detect one, so it has to be declared, or links to it get a language prefix that belongs to neither site."
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:172
+msgid "How each post type is translated"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:174
+msgid "A duplicated post is a real post per language. A single-source post stays one post — right for anything a customer buys, owns or is rated on, because orders and reviews record one ID."
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:183
+msgid "A post per language"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:184
+msgid "One post, translated fields"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:185
+msgid "Not translated"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:192
+msgid "Which taxonomies are translated"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:194
+msgid "A translated taxonomy gets its own terms per language, each with its own name and slug. They list exactly the same items as their source — nothing is re-assigned. Leave a long tail of tags untranslated rather than facing somebody with hundreds of empty boxes."
+msgstr ""
+
+#. translators: %d: how many terms the taxonomy has.
+#: includes/Admin/SettingsScreen.php:205
+#, php-format
+msgid "%d term"
+msgid_plural "%d terms"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Admin/SettingsScreen.php:212
+msgid "Not translated — one set of terms for every language"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:213
+msgid "Translated — its own terms per language"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:220
+msgid "Machine translations"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:222
+msgid "Machine translation is not built yet, but its rules are. A machine translation never replaces one a person wrote or approved, and unreviewed machine output is not shown to visitors unless you say so here."
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:226
+msgid "Show unreviewed machine translations on the site"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:229
+msgid "Uninstalling"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:232
+msgid "Delete all translations when this plugin is deleted"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:235
+msgid "Off by default. Translations are the expensive part, not the code — deleting them because somebody deactivated a plugin to test something is data loss with no undo."
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:243
+msgid "Backup"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:245
+msgid "Every translation is typed into this site by hand, so it exists only here. Export moves them between copies of the same site — objects are matched by ID, not by title."
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:249
+msgid "Export JSON"
+msgstr ""
+
+#: includes/Admin/SettingsScreen.php:257
+msgid "Import"
+msgstr ""
+
+#: includes/Admin/StringsScreen.php:41
+#: includes/Admin/StringsScreen.php:45
+#: includes/Admin/StringsScreen.php:106
+msgid "Strings"
+msgstr ""
+
+#. translators: %s: a count bubble showing how many strings are untranslated.
+#: includes/Admin/StringsScreen.php:44
+#, php-format
+msgid "Strings %s"
+msgstr ""
+
+#. translators: %d: how many strings were saved.
+#: includes/Admin/StringsScreen.php:112
+#, php-format
+msgid "%d string saved."
+msgid_plural "%d strings saved."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Admin/StringsScreen.php:119
+msgid "Text that is not in a theme or plugin file, so it cannot be translated the usual way — labels typed into settings, and values stored in options. Strings appear here once the page that uses them has been rendered at least once."
+msgstr ""
+
+#: includes/Admin/StringsScreen.php:123
+msgid "Add a second language first."
+msgstr ""
+
+#: includes/Admin/StringsScreen.php:140
+msgid "Show all strings"
+msgstr ""
+
+#: includes/Admin/StringsScreen.php:140
+msgid "Show untranslated only"
+msgstr ""
+
+#: includes/Admin/StringsScreen.php:151
+msgid "Source"
+msgstr ""
+
+#: includes/Admin/StringsScreen.php:152
+msgid "Where"
+msgstr ""
+
+#: includes/Admin/StringsScreen.php:153
+msgid "Translation"
+msgstr ""
+
+#: includes/Admin/StringsScreen.php:157
+msgid "Nothing here yet. Visit the pages that show this text on the front end, and it will be collected."
+msgstr ""
+
+#: includes/Admin/StringsScreen.php:171
+msgid "Machine translation, not reviewed — not shown on the site until somebody approves it."
+msgstr ""
+
+#: includes/Admin/StringsScreen.php:179
+msgid "Save translations"
+msgstr ""
+
+#: includes/Admin/TermTranslations.php:103
+msgid "This term"
+msgstr ""
+
+#: includes/Admin/TermTranslations.php:107
+msgid "Other languages"
+msgstr ""
+
+#: includes/Admin/TermTranslations.php:111
+msgid "A translated term keeps its own name and slug, and lists exactly the same items as this one — nothing is re-assigned."
+msgstr ""
+
+#. translators: %s: a language name.
+#: includes/Admin/TermTranslations.php:150
+#, php-format
+msgid "Add %s"
+msgstr ""
+
+#: includes/Admin/TermTranslations.php:167
+#: includes/Translations/Terms.php:88
+msgid "That term does not exist."
+msgstr ""
+
+#: includes/Admin/TermTranslations.php:197
+msgid "Translated term created. Give it a name and slug in its own language — it already lists the same items as its source."
+msgstr ""
+
+#. translators: %s: the language this post is written in.
+#: includes/Admin/TranslationsBox.php:78
+#, php-format
+msgid "This is the %s version."
+msgstr ""
+
+#: includes/Admin/TranslationsBox.php:97
+msgid "Edit"
+msgstr ""
+
+#: includes/Admin/TranslationsBox.php:104
+msgid "Create"
+msgstr ""
+
+#: includes/Admin/TranslationsBox.php:117
+msgid "Re-copy shared fields"
+msgstr ""
+
+#: includes/Admin/TranslationsBox.php:118
+msgid "Rewrites images, links, IDs and settings from the source, leaving translated text alone. The copy made when this translation was created is a snapshot, and the source keeps changing."
+msgstr ""
+
+#: includes/Admin/TranslationsBox.php:123
+msgid "Creating a translation copies this post’s fields, so the new page starts with the same images, links and layout — only the text needs rewriting."
+msgstr ""
+
+#: includes/Admin/TranslationsBox.php:134
+msgid "This page is the same page in every language."
+msgstr ""
+
+#: includes/Admin/TranslationsBox.php:140
+msgid "Duplicating it would break what it does, because the plugin that owns it finds it by ID. It is reachable under every language prefix, and what a visitor reads is its shortcodes output, translated as text rather than as a page."
+msgstr ""
+
+#: includes/Admin/TranslationsBox.php:146
+msgid "Reachable at:"
+msgstr ""
+
+#: includes/Admin/TranslationsBox.php:194
+msgid "Translation created as a draft, with the source’s fields copied. Rewrite the text and publish when it is ready."
+msgstr ""
+
+#. translators: %d: number of fields rewritten from the source.
+#: includes/Admin/TranslationsBox.php:198
+#, php-format
+msgid "%d shared field re-copied from the source."
+msgid_plural "%d shared fields re-copied from the source."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: the name of an Easy Digital Downloads setting, e.g. "Checkout".
+#: includes/Integrations/Edd.php:65
+#, php-format
+msgid "Easy Digital Downloads uses this page for %s"
+msgstr ""
+
+#: includes/Languages/Registry.php:218
+msgid "Add at least one language."
+msgstr ""
+
+#: includes/Languages/Registry.php:225
+msgid "(unnamed)"
+msgstr ""
+
+#. translators: %s: the language code that was rejected.
+#: includes/Languages/Registry.php:234
+#, php-format
+msgid "\"%s\" is not a usable language code. Use two letters, optionally with a region, e.g. es or pt-br."
+msgstr ""
+
+#. translators: %s: the duplicated language code.
+#: includes/Languages/Registry.php:242
+#, php-format
+msgid "The code \"%s\" is used twice. Each language needs its own."
+msgstr ""
+
+#. translators: 1: language code, 2: what already uses that path.
+#: includes/Languages/Registry.php:254
+#, php-format
+msgid "The code \"%1$s\" cannot be used: %2$s already answers to that path."
+msgstr ""
+
+#. translators: 1: the locale that was rejected, 2: the language it belongs to.
+#: includes/Languages/Registry.php:263
+#, php-format
+msgid "\"%1$s\" is not a WordPress locale (%2$s). Use the form es_ES."
+msgstr ""
+
+#. translators: %s: the language being configured.
+#: includes/Languages/Registry.php:272
+#, php-format
+msgid "Give %s a native name — it is what the language switcher shows."
+msgstr ""
+
+#: includes/Languages/Registry.php:279
+msgid "The default language must be one of the languages listed."
+msgstr ""
+
+#: includes/Languages/Registry.php:284
+msgid "The default language cannot be inactive — it is what a URL with no prefix serves."
+msgstr ""
+
+#: includes/Languages/Registry.php:306
+msgid "WordPress or a common endpoint"
+msgstr ""
+
+#. translators: %s: the title of an existing page.
+#: includes/Languages/Registry.php:323
+#, php-format
+msgid "the page \"%s\""
+msgstr ""
+
+#. translators: %s: the name of a post type.
+#: includes/Languages/Registry.php:336
+#, php-format
+msgid "the \"%s\" archive"
+msgstr ""
+
+#. translators: %s: the name of a taxonomy.
+#: includes/Languages/Registry.php:347
+#, php-format
+msgid "the \"%s\" taxonomy"
+msgstr ""
+
+#: includes/Translations/Duplicator.php:40
+msgid "That post does not exist."
+msgstr ""
+
+#: includes/Translations/Duplicator.php:43
+#: includes/Translations/Fields.php:100
+#: includes/Translations/Groups.php:120
+msgid "That language is not configured."
+msgstr ""
+
+#: includes/Translations/Duplicator.php:46
+msgid "This post type is not translated by duplication."
+msgstr ""
+
+#: includes/Translations/Duplicator.php:49
+#: includes/Translations/Terms.php:97
+msgid "A translation in that language already exists."
+msgstr ""
+
+#: includes/Translations/Duplicator.php:56
+msgid "This page is not translated by duplicating it - what a visitor reads is its shortcodes output, which is translated as text rather than as a page."
+msgstr ""
+
+#: includes/Translations/Fields.php:97
+msgid "A translation needs an object and a field."
+msgstr ""
+
+#: includes/Translations/Fields.php:105
+msgid "The default language is stored on the post itself, not as a translation."
+msgstr ""
+
+#: includes/Translations/Fields.php:108
+#: includes/Translations/Groups.php:123
+#: includes/Translations/Strings.php:139
+msgid "Meridian’s tables are missing. Deactivate and reactivate the plugin."
+msgstr ""
+
+#. translators: %s: the field that was not overwritten.
+#: includes/Translations/Fields.php:122
+#, php-format
+msgid "\"%s\" already has a translation a person wrote or approved. Pass replace to overwrite it."
+msgstr ""
+
+#: includes/Translations/Functional.php:54
+msgid "marked as a shared page in Meridian’s settings"
+msgstr ""
+
+#: includes/Translations/Groups.php:117
+msgid "Nothing to link."
+msgstr ""
+
+#. translators: %s: the language that already has a translation in this group.
+#: includes/Translations/Groups.php:131
+#, php-format
+msgid "This set already has a %s version."
+msgstr ""
+
+#: includes/Translations/Slugs.php:80
+msgid "A translated slug cannot be empty. Clear it to fall back to the source slug."
+msgstr ""
+
+#. translators: %s: the slug that is already in use.
+#: includes/Translations/Slugs.php:87
+#, php-format
+msgid "The slug \"%s\" is already used by another translation in this language."
+msgstr ""
+
+#: includes/Translations/Strings.php:136
+#: includes/Translations/Terms.php:91
+msgid "Pick a language other than the default one."
+msgstr ""
+
+#: includes/Translations/Strings.php:158
+msgid "That string already has a translation a person wrote or approved."
+msgstr ""
+
+#: includes/Translations/Terms.php:94
+msgid "This taxonomy is not set to be translated. Turn it on in Meridian’s settings first."
+msgstr ""

@@ -235,7 +235,12 @@ final class Duplicator
      * is only a starting point: M3 is where a real translated slug is
      * typed.
      */
-    private static function available_slug(\WP_Post $source, string $lang): string
+    /**
+     * The stored slug for a new translation: `{source slug}-{lang}`, plus
+     * `-N` if that is taken. UrlSlugs publishes exactly this shape under
+     * the source's slug, so changing it means changing that rule too.
+     */
+    public static function available_slug(\WP_Post $source, string $lang): string
     {
         $base = $source->post_name ? $source->post_name . '-' . $lang : sanitize_title($source->post_title . '-' . $lang);
         $slug = $base;

@@ -22,6 +22,8 @@ use Meridian\Multilingual\Translations\Content;
 use Meridian\Multilingual\Translations\Strings;
 use Meridian\Multilingual\Translations\Functional;
 use Meridian\Multilingual\Translations\Groups;
+use Meridian\Multilingual\Translations\TermAssignment;
+use Meridian\Multilingual\Translations\UrlSlugs;
 use Meridian\Multilingual\Routing\Links;
 use Meridian\Multilingual\Routing\Queries;
 use Meridian\Multilingual\Routing\Query;
@@ -63,6 +65,14 @@ final class Plugin
         // WP-CLI and over REST, and a group row outliving its object is
         // the same bug in all three.
         Groups::register();
+
+        // Also above the admin branch: a slug is renamed in the admin and
+        // the translation's slug has to follow it there.
+        UrlSlugs::register();
+
+        // Everywhere, not just the admin: the block editor's category
+        // list and its saves arrive over REST, where is_admin() is false.
+        TermAssignment::register();
         SettingsScreen::register_paths();
 
         // M13's one switch: whether unreviewed machine output reaches a

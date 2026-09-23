@@ -5,6 +5,7 @@ namespace Meridian\Multilingual\Admin;
 use Meridian\Multilingual\Languages\Registry;
 use Meridian\Multilingual\Translations\Modes;
 use Meridian\Multilingual\Translations\Terms;
+use Meridian\Multilingual\Translations\UrlSlugs;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -103,6 +104,27 @@ final class TermTranslations
                 <th scope="row"><?php esc_html_e('This term', 'meridian'); ?></th>
                 <td><strong><?php echo esc_html($language ? $language->label() : $lang); ?></strong></td>
             </tr>
+            <?php $term_object = get_term($term_id); ?>
+            <?php if ($term_object instanceof \WP_Term && '' !== ($public = UrlSlugs::public_term_url($term_object))) : ?>
+            <tr>
+                <th scope="row"><?php esc_html_e('Public URL', 'meridian'); ?></th>
+                <td>
+                    <a href="<?php echo esc_url($public); ?>" target="_blank" rel="noopener"><?php echo esc_html($public); ?></a>
+                    <?php if (UrlSlugs::for_term($term_object) !== $term_object->slug) : ?>
+                        <p class="description" style="max-width:40em">
+                            <?php
+                            printf(
+                                /* translators: 1: the stored slug, e.g. business-es. 2: the language code. */
+                                esc_html__('The slug above is stored as %1$s only because WordPress needs every slug in a taxonomy to be unique. The language prefix already makes the URL unique, so the "-%2$s" ending is left out of it. To use a slug in this language instead, replace the whole slug, for example with a translated word.', 'meridian'),
+                                '<code>' . esc_html($term_object->slug) . '</code>',
+                                esc_html($lang)
+                            );
+                            ?>
+                        </p>
+                    <?php endif; ?>
+                </td>
+            </tr>
+            <?php endif; ?>
             <tr>
                 <th scope="row"><?php esc_html_e('Other languages', 'meridian'); ?></th>
                 <td>
@@ -194,7 +216,7 @@ final class TermTranslations
         if (isset($_GET['meridian_term_created'])) {
             printf(
                 '<div class="notice notice-success is-dismissible"><p>%s</p></div>',
-                esc_html__('Translated term created. Give it a name and slug in its own language — it already lists the same items as its source.', 'meridian')
+                esc_html__('Translated term created. Give it a name in its own language — it already lists the same items as its source, and is published under the same slug with the language prefix. Replace the slug only if you want a translated one.', 'meridian')
             );
         }
     }

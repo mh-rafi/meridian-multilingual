@@ -9,6 +9,7 @@ use Meridian\Multilingual\Routing\Request;
 use Meridian\Multilingual\Translations\Content;
 use Meridian\Multilingual\Translations\Fields;
 use Meridian\Multilingual\Translations\Modes;
+use Meridian\Multilingual\Translations\Terms;
 use Meridian\Multilingual\Routing\Url;
 use Sightline\SEO\Redirects\Store;
 
@@ -39,6 +40,7 @@ final class Sightline
         add_filter('sightline_description', array(self::class, 'description'), 10, 2);
         add_filter('sightline_webpage_schema', array(self::class, 'in_language'));
         add_filter('sightline_sitemap_post_urls', array(self::class, 'sitemap_urls'), 10, 2);
+        add_filter('sightline_sitemap_term_urls', array(self::class, 'sitemap_term_urls'), 10, 2);
     }
 
     public static function available(): bool
@@ -351,6 +353,77 @@ final class Sightline
         }
 
         return $expanded;
+    }
+
+    /**
+     * A translated category's archive, listed after its source's.
+     *
+     * Sightline leaves empty terms out of the sitemap, reasonably: an
+     * archive with nothing on it is a thin page. A translated term is
+     * always "empty", though. Nothing is assigned to it by design,
+     * because its archive lists the source's items through the widened
+     * group query (Queries::widen_term_query()). So every Spanish category
+     * was missing from the sitemap even though its page is as full as
+     * the English one.
+     *
+     * Each translation is listed only when its source was, which keeps
+     * Sightline's rules (not empty, not noindex) deciding. A translation
+     * marked noindex itself is still left out.
+     *
+     * @param array  $urls
+     * @param string $taxonomy
+     * @return array
+     */
+    public static function sitemap_term_urls($urls, $taxonomy = ''): array
+    {
+        $urls = (array) $urls;
+
+        if (!Registry::is_multilingual() || !Modes::is_translated_taxonomy((string) $taxonomy)) {
+            return $urls;
+        }
+
+        $seen = array();
+        foreach ($urls as $entry) {
+            if (is_array($entry) && !empty($entry['loc'])) {
+                $seen[(string) $entry['loc']] = true;
+            }
+        }
+
+        $active = Registry::active();
+        $robots_key = method_exists(\Sightline\SEO\Meta::class, 'key') ? \Sightline\SEO\Meta::key('robots') : '_sightline_robots';
+        $out = array();
+
+        foreach ($urls as $entry) {
+            $out[] = $entry;
+            if (!is_array($entry) || empty($entry['loc'])) {
+                continue;
+            }
+
+            // The entry's term, from its last path segment: the source's
+            // own slug, since the sitemap is built in the default language.
+            $path = trim((string) wp_parse_url((string) $entry['loc'], PHP_URL_PATH), '/');
+            $term = get_term_by('slug', (string) substr(strrchr('/' . $path, '/'), 1), (string) $taxonomy);
+            if (!$term instanceof \WP_Term || !Registry::is_default(Terms::language_of((int) $term->term_id))) {
+                continue;
+            }
+
+            foreach (Terms::siblings((int) $term->term_id) as $lang => $id) {
+                if ((int) $id === (int) $term->term_id || !isset($active[$lang])) {
+                    continue;
+                }
+                if (false !== stripos((string) get_term_meta((int) $id, $robots_key, true), 'noindex')) {
+                    continue;
+                }
+
+                $link = Links::own_term_link((int) $id);
+                if ('' !== $link && !isset($seen[$link])) {
+                    $seen[$link] = true;
+                    $out[] = array('loc' => $link) + $entry;
+                }
+            }
+        }
+
+        return $out;
     }
 
     private static function swap_last_segment(string $url, string $from, string $to): string

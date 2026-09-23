@@ -7,6 +7,7 @@ use Meridian\Multilingual\Translations\Modes;
 use Meridian\Multilingual\Translations\Posts;
 use Meridian\Multilingual\Translations\Slugs;
 use Meridian\Multilingual\Translations\Terms;
+use Meridian\Multilingual\Translations\UrlSlugs;
 use WP_Post;
 use WP_Term;
 
@@ -54,6 +55,11 @@ final class Links
 
     /** Guards the re-entry when a term link resolves to another term. */
     private static bool $resolving_term = false;
+
+    /**
+     * True while an object's *own* URL is being asked for. See own_permalink().
+     */
+    private static bool $own = false;
 
     public static function register(): void
     {
@@ -181,17 +187,7 @@ final class Links
             return Url::set_language($url, $current);
         }
 
-        // A post translated as separate rows is one language's own row,
-        // so its URL is that language's -- whatever language the page
-        // holding the link happens to be written in. Deciding it from
-        // the current language instead was wrong in both directions:
-        // Posts::has() is true for a Spanish page whenever an English
-        // counterpart exists, so the Spanish page's permalink came back
-        // with the prefix stripped, giving it a second, English-looking
-        // URL that served Spanish content -- and that was the URL every
-        // link and the sitemap used. Where the slug happened to be a
-        // language code, the stripping went further still and /bn/
-        // became the site root.
+        // A post translated as separate rows. See for_separate_post().
         if (Modes::SEPARATE === Modes::for_post_type((string) get_post_type($post_id))) {
             return self::for_separate_post($url, $post_id);
         }
@@ -207,43 +203,80 @@ final class Links
     }
 
     /**
-     * The URL of one language's own post row.
+     * The URL of a post translated as separate rows.
      *
-     * Always that post's own language, never the request's.
+     * Two rules, and which one applies depends on whose row it is.
+     *
+     * A *default-language* row, linked from a page in another language,
+     * follows to that language's translation. That is what menus, the
+     * footer and every theme template refer to -- the English page --
+     * and a Spanish visitor clicking "Terms" wants the Spanish terms.
+     *
+     * A *translated* row's URL is its own, in its own language, whatever
+     * page asks. Deciding it from the current language was wrong in both
+     * directions (found 22 September 2026): Posts::has() is true for a
+     * Spanish page whenever an English counterpart exists, so its
+     * permalink came back with the prefix stripped -- a second,
+     * English-looking URL serving Spanish content, which every link and
+     * the sitemap then used -- and a slug that happened to be a language
+     * code was stripped all the way to the site root.
+     *
+     * Only the first rule ever follows, and it only follows *to* a
+     * translated row, which the second rule then answers for -- so there
+     * is no path by which two rows keep handing a link back and forth.
      */
     private static function for_separate_post(string $url, int $post_id): string
     {
         $lang = Posts::language_of($post_id);
+        $current = Request::code();
+
+        if (!self::$own && Registry::is_default($lang) && $lang !== $current) {
+            $translation = Posts::id($post_id, $current);
+            if ($translation > 0 && $translation !== $post_id) {
+                return self::own_permalink($translation);
+            }
+        }
 
         // A translated front page is served at its language's root, not
         // at its slug: /es/ and /es/elementor-home-es/ are one page and
-        // the second only redirects to the first. Answering with the
-        // slug put the redirecting URL into every link and into the
-        // sitemap. Alternates::for_post_id() already decides a front
-        // page translation the same way for hreflang (M8); this is the
-        // same rule on the permalink side.
-        if (self::is_front_page_translation($post_id)) {
+        // the second only redirects to the first.
+        if (Query::is_front_page_member($post_id)) {
             return Url::set_language(home_url('/'), $lang);
         }
 
-        return Url::set_language($url, $lang);
+        return Url::set_language(UrlSlugs::post_url($url, $post_id), $lang);
     }
 
     /**
-     * Whether a post is the site's front page in some language.
+     * A post's own URL, never followed to a translation.
+     *
+     * For everything that describes a row rather than links to content:
+     * hreflang, the sitemap, canonical redirects. Asking get_permalink()
+     * for the English row while serving Spanish would otherwise hand
+     * back the Spanish URL, and the English alternate would announce
+     * itself at a page that is not English.
      */
-    private static function is_front_page_translation(int $post_id): bool
+    public static function own_permalink(int $post_id): string
     {
-        if ('page' !== get_option('show_on_front')) {
-            return false;
-        }
+        $was = self::$own;
+        self::$own = true;
+        $url = (string) get_permalink($post_id);
+        self::$own = $was;
 
-        // The stored option, not the filtered one: Query filters
-        // page_on_front to the current language's front page, and the
-        // question here is about the site's own.
-        $front = (int) Query::stored_front_page();
+        return $url;
+    }
 
-        return $front > 0 && Posts::id($front, Posts::language_of($post_id)) === $post_id;
+    /**
+     * A term's own URL, never followed to a translation. See own_permalink().
+     */
+    public static function own_term_link(int $term_id): string
+    {
+        $was = self::$own;
+        self::$own = true;
+        $url = get_term_link($term_id);
+        self::$own = $was;
+
+        return is_wp_error($url) ? '' : (string) $url;
     }
 
     /**
@@ -301,7 +334,20 @@ final class Links
         if (!$translated_taxonomy) {
             $available = true;
         } else {
-            $translation = ($term_id > 0 && !Registry::is_default($current)) ? Terms::translation($term_id, $current) : 0;
+            // A translated term's URL is its own, in its own language and
+            // with its public slug, whatever page links to it -- the same
+            // rule as for_separate_post(), for the same reason. Deciding
+            // it from the current language sent the Spanish category to
+            // /downloads/category/business-es/, unprefixed, from every
+            // English page -- which is where the sitemap is built.
+            $term_lang = $term_id > 0 ? Terms::language_of($term_id) : Registry::default_code();
+            if ($term instanceof WP_Term && !Registry::is_default($term_lang)) {
+                return Url::set_language(UrlSlugs::term_url((string) $url, $term), $term_lang);
+            }
+
+            // A default-language term follows to the current language's
+            // translation -- unless its own URL is what was asked for.
+            $translation = (!self::$own && $term_id > 0 && !Registry::is_default($current)) ? Terms::translation($term_id, $current) : 0;
 
             if ($translation > 0 && !self::$resolving_term) {
                 // Point at the translated term itself, not at this

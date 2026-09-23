@@ -7,6 +7,7 @@ use Meridian\Multilingual\Translations\Modes;
 use Meridian\Multilingual\Translations\Posts;
 use Meridian\Multilingual\Translations\Slugs;
 use Meridian\Multilingual\Translations\Terms;
+use Meridian\Multilingual\Translations\UrlSlugs;
 use WP_Post;
 use WP_Query;
 
@@ -31,6 +32,7 @@ final class Query
     public static function register(): void
     {
         add_filter('request', array(self::class, 'translated_slug'));
+        add_filter('request', array(self::class, 'public_slugs'));
         add_filter('request', array(self::class, 'front_page'));
         add_filter('pre_option_page_on_front', array(self::class, 'front_page_option'));
         add_action('wp', array(self::class, 'enforce_translation_exists'));
@@ -107,6 +109,124 @@ final class Query
 
         wp_safe_redirect($target, 301);
         exit;
+    }
+
+    /**
+     * Turn a translation's public slug back into its stored one.
+     *
+     * The request half of UrlSlugs. /es/downloads/category/business/
+     * arrives asking for 'business' -- the English term's slug -- and
+     * leaves asking for 'business-es', the Spanish term that is
+     * published there. Everything downstream (widen_term_query(),
+     * redirect_mismatched_term(), the template) then simply sees the
+     * Spanish term, as if its URL had named it directly.
+     *
+     * On 'request', like translated_slug(): after the rewrite rules have
+     * matched and before the query runs.
+     *
+     * @param array $vars
+     * @return array
+     */
+    public static function public_slugs(array $vars): array
+    {
+        if (is_admin() || !Registry::is_multilingual()) {
+            return $vars;
+        }
+
+        $lang = isset($vars['lang']) ? (string) $vars['lang'] : '';
+        if ('' === $lang || Registry::is_default($lang) || !Registry::exists($lang)) {
+            return $vars;
+        }
+
+        foreach (get_taxonomies(array(), 'objects') as $taxonomy) {
+            if (!Modes::is_translated_taxonomy($taxonomy->name)) {
+                continue;
+            }
+
+            $var = $taxonomy->query_var ?: $taxonomy->name;
+            if (!empty($vars[$var]) && is_string($vars[$var])) {
+                $vars[$var] = UrlSlugs::stored_term_path($vars[$var], $taxonomy->name, $lang);
+            }
+        }
+
+        foreach (get_post_types(array('public' => true)) as $post_type) {
+            if (Modes::SEPARATE !== Modes::for_post_type($post_type)) {
+                continue;
+            }
+
+            // The var a permalink resolves into: 'pagename' for pages,
+            // 'name' for posts, the post type's own var for the rest.
+            $object = get_post_type_object($post_type);
+            $var = 'page' === $post_type ? 'pagename' : ('post' === $post_type ? 'name' : ($object && $object->query_var ? $object->query_var : $post_type));
+
+            if (!empty($vars[$var]) && is_string($vars[$var])) {
+                $vars[$var] = UrlSlugs::stored_post_path($vars[$var], $post_type, $lang);
+            }
+        }
+
+        return $vars;
+    }
+
+    /**
+     * 301 a request to an object's public URL when it named the object
+     * by a stored slug instead.
+     *
+     * Compared as a path prefix, so the public URL's own sub-pages --
+     * /page/2/, a paginated post's /2/, a feed -- are left alone. The
+     * one thing that differs is carried over: a paged request goes to
+     * the same page of the public URL, not back to page one.
+     *
+     * @param int  $page    The page number the request asked for.
+     * @param bool $archive Whether that is an archive page (/page/N/)
+     *                      rather than a post's own page (/N/).
+     */
+    private static function redirect_to_public_url(string $target, int $page, bool $archive): void
+    {
+        if ('' === $target || is_feed() || is_preview()) {
+            return;
+        }
+
+        $uri = isset($_SERVER['REQUEST_URI']) ? (string) wp_unslash($_SERVER['REQUEST_URI']) : '';
+        $requested = trailingslashit((string) wp_parse_url($uri, PHP_URL_PATH));
+        $public = trailingslashit((string) wp_parse_url($target, PHP_URL_PATH));
+
+        if (0 === strpos($requested, $public)) {
+            return;
+        }
+
+        if ($page > 1) {
+            global $wp_rewrite;
+            $target = trailingslashit($target) . ($archive
+                ? user_trailingslashit($wp_rewrite->pagination_base . '/' . $page, 'paged')
+                : user_trailingslashit((string) $page, 'single_paged'));
+        }
+
+        $query = (string) wp_parse_url($uri, PHP_URL_QUERY);
+        if ('' !== $query) {
+            $target .= (false === strpos($target, '?') ? '?' : '&') . $query;
+        }
+
+        wp_safe_redirect($target, 301);
+        exit;
+    }
+
+    /**
+     * Whether a post is the site's front page in some language.
+     *
+     * Such a post is served at its language's root, never at its slug.
+     */
+    public static function is_front_page_member(int $post_id): bool
+    {
+        if ('page' !== get_option('show_on_front')) {
+            return false;
+        }
+
+        // The stored option, not the filtered one: this class filters
+        // page_on_front to the current language's front page, and the
+        // question here is about the site's own.
+        $front = (int) self::stored_front_page();
+
+        return $front > 0 && Posts::id($front, Posts::language_of($post_id)) === $post_id;
     }
 
     /**
@@ -378,7 +498,14 @@ final class Query
         }
 
         if (Posts::language_of($post_id) === $url_lang) {
-            // Already the row that belongs to this URL's language.
+            // Already the row that belongs to this URL's language -- but
+            // perhaps asked for by its stored slug, /es/terms-es/, which
+            // resolves because it is real and is still not the address
+            // it is published at. Separate rows only: a single-source
+            // post under its source slug is M3's deliberate fallback.
+            if (Modes::SEPARATE === Modes::for_post_type((string) get_post_type($post_id))) {
+                self::redirect_to_public_url(Links::own_permalink($post_id), (int) $wp_query->get('page'), false);
+            }
             return;
         }
 
@@ -457,7 +584,9 @@ final class Query
 
         if ($term_lang === $url_lang) {
             // Already the term that belongs to this URL's language --
-            // the ordinary, correctly-resolved case.
+            // the ordinary, correctly-resolved case, unless it was asked
+            // for by its stored slug (/es/.../business-es/).
+            self::redirect_to_public_url(Links::own_term_link((int) $term->term_id), (int) $wp_query->get('paged'), true);
             return;
         }
 

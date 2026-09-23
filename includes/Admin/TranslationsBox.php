@@ -9,6 +9,7 @@ use Meridian\Multilingual\Translations\Functional;
 use Meridian\Multilingual\Translations\Groups;
 use Meridian\Multilingual\Translations\Modes;
 use Meridian\Multilingual\Translations\Posts;
+use Meridian\Multilingual\Translations\UrlSlugs;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -78,6 +79,21 @@ final class TranslationsBox
             esc_html__('This is the %s version.', 'meridian'),
             '<strong>' . esc_html($language ? $language->label() : $lang) . '</strong>'
         ) . '</p>';
+
+        // Where a translation is published, which the editor's own
+        // permalink field cannot say: it shows the stored slug.
+        if (!Registry::is_default($lang) && 'publish' === get_post_status($post_id)) {
+            $public = UrlSlugs::public_post_url($post_id);
+            echo '<p class="description" style="margin-top:0"><strong>' . esc_html__('Published at:', 'meridian') . '</strong><br><a href="' . esc_url($public) . '" target="_blank" rel="noopener">' . esc_html($public) . '</a></p>';
+
+            if (UrlSlugs::for_post($post_id) !== (string) get_post_field('post_name', $post_id)) {
+                echo '<p class="description">' . esc_html(sprintf(
+                    /* translators: %s: the language code. */
+                    __('The slug ends in "-%s" only because WordPress needs it unique; the language prefix already makes the URL unique, so that ending is left out of it.', 'meridian'),
+                    $lang
+                )) . '</p>';
+            }
+        }
 
         echo '<table class="widefat striped" style="margin-bottom:10px"><tbody>';
 

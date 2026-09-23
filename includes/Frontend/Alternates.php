@@ -3,6 +3,7 @@
 namespace Meridian\Multilingual\Frontend;
 
 use Meridian\Multilingual\Languages\Registry;
+use Meridian\Multilingual\Routing\Links;
 use Meridian\Multilingual\Routing\Query;
 use Meridian\Multilingual\Routing\Request;
 use Meridian\Multilingual\Routing\Url;
@@ -165,7 +166,7 @@ final class Alternates
             // are normalised to the language they actually belong to.
             $set[$code] = self::is_front_page_translation($post_id, $translation)
                 ? Url::set_language(home_url('/'), $code)
-                : Url::set_language((string) get_permalink($translation), $code);
+                : Url::set_language(Links::own_permalink($translation), $code);
         }
 
         return $set;
@@ -230,9 +231,12 @@ final class Alternates
             if (!Registry::exists($code)) {
                 continue;
             }
-            $link = get_term_link((int) $term_id);
-            if (!is_wp_error($link)) {
-                $set[$code] = Url::set_language((string) $link, $code);
+            // Each member's own URL. get_term_link() on the English term
+            // while serving Spanish follows to the Spanish one, and the
+            // English alternate then pointed at a Spanish page.
+            $link = Links::own_term_link((int) $term_id);
+            if ('' !== $link) {
+                $set[$code] = Url::set_language($link, $code);
             }
         }
 

@@ -2,6 +2,7 @@
 
 namespace Meridian\Multilingual\Translations;
 
+use Meridian\Multilingual\Database\Schema;
 use Meridian\Multilingual\Languages\Registry;
 use WP_Error;
 use WP_Term;
@@ -73,6 +74,47 @@ final class Terms
         }
 
         return $ids;
+    }
+
+    /**
+     * The terms of a taxonomy not to offer an item written in $lang.
+     *
+     * Every term in another language, and every default-language term
+     * with a translation in $lang, whose translation is offered in its
+     * place. A default-language term with no translation in $lang stays,
+     * because it is still the only term of its kind.
+     *
+     * @return int[]
+     */
+    public static function hidden_for(string $taxonomy, string $lang): array
+    {
+        global $wpdb;
+
+        if (!Schema::translations_installed()) {
+            return array();
+        }
+
+        $table = Schema::translations_table();
+        $rows = $wpdb->get_results($wpdb->prepare(
+            "SELECT m.object_id, m.lang
+             FROM {$table} m
+             INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_id = m.object_id AND tt.taxonomy = %s
+             WHERE m.object_type = %s AND m.lang <> %s",
+            $taxonomy,
+            self::TYPE,
+            $lang
+        ), ARRAY_A);
+
+        $hidden = array();
+        foreach ((array) $rows as $row) {
+            $id = (int) $row['object_id'];
+            if (Registry::is_default((string) $row['lang']) && self::translation($id, $lang) < 1) {
+                continue;
+            }
+            $hidden[] = $id;
+        }
+
+        return $hidden;
     }
 
     /**
@@ -165,7 +207,12 @@ final class Terms
         }
     }
 
-    private static function available_slug(WP_Term $source, string $lang): string
+    /**
+     * The stored slug for a new translation: `{source slug}-{lang}`, plus
+     * `-N` if that is taken. UrlSlugs publishes exactly this shape under
+     * the source's slug, so changing it means changing that rule too.
+     */
+    public static function available_slug(WP_Term $source, string $lang): string
     {
         $base = $source->slug . '-' . $lang;
         $slug = $base;

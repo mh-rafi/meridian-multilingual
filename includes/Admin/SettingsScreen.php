@@ -5,6 +5,7 @@ namespace Meridian\Multilingual\Admin;
 use Meridian\Multilingual\Languages\Registry;
 use Meridian\Multilingual\Translations\Functional;
 use Meridian\Multilingual\Translations\Modes;
+use Meridian\Multilingual\Translations\TermAssignment;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -22,11 +23,13 @@ final class SettingsScreen
 {
     const SLUG = 'meridian-settings';
     const NONCE = 'meridian_save_settings';
+    const REPAIR = 'meridian_repair_terms';
 
     public function __construct()
     {
         add_action('admin_menu', array($this, 'register'), 11);
         add_action('admin_post_meridian_save_settings', array($this, 'save'));
+        add_action('admin_post_' . self::REPAIR, array($this, 'repair_terms'));
     }
 
     public function register(): void
@@ -113,6 +116,25 @@ final class SettingsScreen
             <?php endif; ?>
             <?php if (!empty($_GET['meridian_error'])) : ?>
                 <div class="notice notice-error"><p><?php echo esc_html(sanitize_text_field(wp_unslash($_GET['meridian_error']))); ?></p></div>
+            <?php endif; ?>
+            <?php $repaired = isset($_GET['meridian_repaired']) ? get_transient(self::REPAIR . '_' . get_current_user_id()) : false; ?>
+            <?php if (isset($_GET['meridian_repaired'])) : ?>
+                <div class="notice notice-success is-dismissible"><p><?php
+                    $repaired = is_array($repaired) ? $repaired : array();
+                    delete_transient(self::REPAIR . '_' . get_current_user_id());
+                    if (!$repaired) {
+                        esc_html_e('Every item is already filed under categories in its own language. Nothing changed.', 'meridian');
+                    } else {
+                        printf(
+                            /* translators: %d: how many items had their categories corrected. */
+                            esc_html(_n('Corrected the categories of %d item:', 'Corrected the categories of %d items:', count($repaired), 'meridian')),
+                            count($repaired)
+                        );
+                        echo ' ' . esc_html(implode(', ', array_map(static function ($id) {
+                            return wp_strip_all_tags(get_the_title($id)) . ' (#' . (int) $id . ')';
+                        }, array_slice($repaired, 0, 25))));
+                    }
+                ?></p></div>
             <?php endif; ?>
             <?php if (isset($_GET['meridian_imported'])) : ?>
                 <div class="notice notice-success is-dismissible"><p><?php
@@ -240,6 +262,18 @@ final class SettingsScreen
 
             <hr>
 
+            <h2><?php esc_html_e('Category assignments', 'meridian'); ?></h2>
+            <p class="description" style="max-width:46em">
+                <?php esc_html_e('A product is filed under its categories in the default language; the translated category already lists the same products. Earlier versions offered both terms on the product screen, so some products may be filed under both. This puts every item\'s categories in its own language. It is safe to run more than once.', 'meridian'); ?>
+            </p>
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                <input type="hidden" name="action" value="<?php echo esc_attr(self::REPAIR); ?>">
+                <?php wp_nonce_field(self::REPAIR); ?>
+                <?php submit_button(__('Repair category assignments', 'meridian'), 'secondary', 'submit', false); ?>
+            </form>
+
+            <hr>
+
             <h2><?php esc_html_e('Backup', 'meridian'); ?></h2>
             <p class="description" style="max-width:46em">
                 <?php esc_html_e('Every translation is typed into this site by hand, so it exists only here. Export moves them between copies of the same site — objects are matched by ID, not by title.', 'meridian'); ?>
@@ -264,6 +298,21 @@ final class SettingsScreen
     /**
      * Feed the stored paths to the routing exclusion.
      */
+    public function repair_terms(): void
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('You are not allowed to change these settings.', 'meridian'));
+        }
+        check_admin_referer(self::REPAIR);
+
+        // The list goes through a transient rather than the URL, which
+        // is no place for a hundred IDs.
+        set_transient(self::REPAIR . '_' . get_current_user_id(), TermAssignment::repair(), 10 * MINUTE_IN_SECONDS);
+
+        wp_safe_redirect(add_query_arg(array('page' => self::SLUG, 'meridian_repaired' => 1), admin_url('admin.php')));
+        exit;
+    }
+
     public static function register_paths(): void
     {
         add_filter('meridian_untranslatable_paths', static function ($paths) {

@@ -39,6 +39,7 @@ final class Sightline
         add_filter('sightline_title', array(self::class, 'title'), 10, 2);
         add_filter('sightline_description', array(self::class, 'description'), 10, 2);
         add_filter('sightline_webpage_schema', array(self::class, 'in_language'));
+        add_filter('sightline_website_schema', array(self::class, 'website_schema'));
         add_filter('sightline_sitemap_post_urls', array(self::class, 'sitemap_urls'), 10, 2);
         add_filter('sightline_sitemap_term_urls', array(self::class, 'sitemap_term_urls'), 10, 2);
     }
@@ -289,6 +290,40 @@ final class Sightline
 
         if ($language) {
             $schema['inLanguage'] = str_replace('_', '-', $language->locale ?: $language->code);
+        }
+
+        return $schema;
+    }
+
+    /**
+     * The WebSite node in the current language.
+     *
+     * Its description is the site tagline, which is a single option and
+     * not translated, so a translated front end would describe itself in
+     * the default language. There it takes the translated front page's
+     * own SEO description instead, and carries none when that is unset --
+     * no description is better than one in the wrong language.
+     *
+     * @param mixed $schema
+     * @return array
+     */
+    public static function website_schema($schema): array
+    {
+        $schema = self::in_language($schema);
+        $code = Request::code();
+
+        if ('' === $code || Registry::is_default($code)) {
+            return $schema;
+        }
+
+        // page_on_front is already filtered to this language's front page.
+        $front = (int) get_option('page_on_front');
+        $description = $front ? trim((string) get_post_meta($front, '_sightline_description', true)) : '';
+
+        if ('' !== $description) {
+            $schema['description'] = html_entity_decode(wp_strip_all_tags($description), ENT_QUOTES, 'UTF-8');
+        } else {
+            unset($schema['description']);
         }
 
         return $schema;

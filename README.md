@@ -132,6 +132,15 @@ Three tables, prefixed like the rest of WordPress:
 
 Keeps everything by default. Deleting a site's translations because somebody deactivated a plugin to test something is not a tidy-up, it is data loss with no undo — and the translations are the expensive part, not the code. Enable **delete data on uninstall** in Settings first if you want the tables dropped.
 
+## Development
+
+This repository is the single source for every site that runs Meridian. On the UI Lib workspaces it is checked out as a submodule of the main website (`ui-lib-website/wordpress/plugins/meridian-multilingual`), and the blog's Docker setup mounts that same folder — so one edit is live on both local sites at once.
+
+- **Test on every site that runs it** before committing: the main store (`localhost:8080`, with EDD, `edd-widgets` and Sightline) and the blog (`localhost:8082`, with Sightline but no store).
+- **Nothing site-specific goes in here.** Integrations stay detected, never required; per-site differences go through settings or the filters above.
+- **Every change bumps the version** in the plugin header, and the same version is deployed to every production site.
+- Requirement IDs in code comments (M0, M1, …) refer to section 6 of `MULTILINGUAL-PLUGIN-SPEC.md` in the website workspace. Read the relevant "As built" note there before changing that part.
+
 ## License
 
 GPL-2.0-or-later. See <https://www.gnu.org/licenses/gpl-2.0.html>.

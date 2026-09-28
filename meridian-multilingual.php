@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Meridian
  * Description: Multilingual content with directory-prefixed URLs, correct hreflang, and a storage model that does not duplicate a product a customer bought once.
- * Plugin URI: https://ui-lib.com/
+ * Plugin URI: https://github.com/mh-rafi/meridian-multilingual
  * Author: MH Rafi
  * Author URI: https://ui-lib.com/
  * Version: 0.1.0

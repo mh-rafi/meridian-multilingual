@@ -77,8 +77,10 @@ final class Request
             return $default;
         }
 
-        // The query var, once WordPress has parsed the request.
-        $queried = get_query_var('lang');
+        // The query var, once WordPress has parsed the request. A URL
+        // built during plugins_loaded (EDD's licensing requests do it)
+        // comes before $wp_query exists, and get_query_var() fatals.
+        $queried = isset($GLOBALS['wp_query']) ? get_query_var('lang') : '';
         if ($queried && Registry::exists((string) $queried)) {
             return (string) $queried;
         }

@@ -284,6 +284,18 @@ final class Alternates
         // term into an hreflang set publishes it.
         $path = (string) wp_parse_url($uri, PHP_URL_PATH);
 
+        // REQUEST_URI is from the server root, and home_url() adds the
+        // install's own subdirectory. On a site in /blog/ that doubled
+        // it: /blog/ became /blog/blog/ in the switcher and in hreflang.
+        $base = Request::base_path();
+        if ('/' !== $base) {
+            if (0 === strpos($path, $base)) {
+                $path = substr($path, strlen($base) - 1);
+            } elseif ($path === rtrim($base, '/')) {
+                $path = '/';
+            }
+        }
+
         return home_url($path);
     }
 

@@ -6,7 +6,7 @@
  * Plugin URI: https://github.com/mh-rafi/meridian-multilingual
  * Author: MH Rafi
  * Author URI: https://ui-lib.com/
- * Version: 0.1.0
+ * Version: 0.1.1
  * Requires at least: 6.4
  * Requires PHP: 8.1
  * License: GPL-2.0-or-later
@@ -26,7 +26,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('MERIDIAN_VERSION', '0.1.0');
+define('MERIDIAN_VERSION', '0.1.1');
 define('MERIDIAN_FILE', __FILE__);
 define('MERIDIAN_PATH', plugin_dir_path(__FILE__));
 define('MERIDIAN_URL', plugin_dir_url(__FILE__));

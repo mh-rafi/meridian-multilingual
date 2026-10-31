@@ -3,6 +3,7 @@
 namespace Meridian\Multilingual;
 
 use Meridian\Multilingual\Admin\LanguagesScreen;
+use Meridian\Multilingual\Admin\ListFilter;
 use Meridian\Multilingual\Admin\Porter;
 use Meridian\Multilingual\Admin\ProductTranslationBox;
 use Meridian\Multilingual\Admin\SettingsScreen;
@@ -92,6 +93,7 @@ final class Plugin
             new StringsScreen();
             new Porter();
             new TranslationsBox();
+            new ListFilter();
             new ProductTranslationBox();
             new TermTranslations();
             return;
